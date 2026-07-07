@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>MBTI 职业性格测试 · 中智咨询</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #b8d4e8 0%, #a8c8dd 25%, #c2dae8 50%, #aec9db 75%, #b5cfe2 100%);
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: -15%;
+            right: -10%;
+            width: 75%;
+            height: 75%;
+            background: radial-gradient(circle at 40% 35%, rgba(180, 210, 235, 0.6) 0%, rgba(150, 190, 215, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            bottom: -10%;
+            left: -8%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(circle at 60% 65%, rgba(170, 200, 225, 0.5) 0%, rgba(140, 175, 200, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glass-card {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 520px;
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 36px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 25px 45px rgba(70, 100, 130, 0.25), 0 8px 20px rgba(50, 80, 110, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+            padding: 24px 20px 28px;
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .test-header h1 {
+            font-size: 1.6rem;
+            font-weight: 550;
+            color: #1b4565;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .test-header .subtitle {
+            font-size: 0.85rem;
+            color: #3a6d90;
+            font-weight: 400;
+        }
+
+        .dimension-hint {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #2e5d80;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 25px;
+            padding: 5px 18px;
+            margin: 0 auto 14px;
+            width: fit-content;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .progress-section {
+            margin: 12px 0 14px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(180, 200, 215, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #5b9cc9, #3f7eb0);
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(50, 120, 185, 0.5);
+            transition: width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1);
+        }
+
+        .question-counter {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #356080;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 28px;
+            padding: 24px 18px;
+            margin: 8px 0 18px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 12px 25px rgba(60, 90, 120, 0.12);
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 480;
+            color: #1a3f5a;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255, 255, 255, 0.75);
+            border-radius: 24px;
+            padding: 16px 18px;
+            font-size: 1.05rem;
+            font-weight: 480;
+            color: #1e4260;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 5px 12px rgba(60, 90, 120, 0.1);
+            word-break: break-word;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.75);
+            border-color: rgba(100, 150, 200, 0.6);
+            box-shadow: 0 8px 18px rgba(50, 100, 150, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active {
+            transform: translateY(1px);
+            background: rgba(240, 245, 250, 0.8);
+        }
+
+        .option-letter {
+            background: rgba(70, 140, 200, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 16px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1b4a72;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+        }
+
+        .result-container {
+            animation: fadeSlide 0.5s ease;
+        }
+
+        .personality-type {
+            font-size: 3.2rem;
+            font-weight: 550;
+            letter-spacing: 5px;
+            color: #1a4060;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 8px 0;
+            margin: 12px 0;
+            text-align: center;
+        }
+
+        .type-name {
+            font-size: 1.4rem;
+            font-weight: 480;
+            color: #2e5880;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .analysis-box {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 18px 16px;
+            margin: 14px 0;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            text-align: left;
+            color: #1c3d58;
+            line-height: 1.7;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 14px 0;
+        }
+
+        .score-item {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+            color: #1e4262;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .restart-btn,
+        .history-btn,
+        .back-btn {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(255, 255, 255, 0.8);
+            border-radius: 30px;
+            padding: 12px 22px;
+            color: #1e4a6e;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            box-shadow: 0 6px 16px rgba(50, 90, 130, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .restart-btn:hover,
+        .history-btn:hover,
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.75);
+            box-shadow: 0 8px 20px rgba(50, 100, 150, 0.25);
+            transform: scale(1.02);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 16px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(50, 90, 130, 0.2);
+        }
+
+        .history-type {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a4060;
+            letter-spacing: 2px;
+        }
+
+        .history-time {
+            font-size: 0.8rem;
+            color: #5a8099;
+        }
+
+        .history-name {
+            font-size: 0.9rem;
+            color: #356080;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #5a8099;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .clear-history-btn {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(200, 100, 100, 0.4);
+            color: #8b4a4a;
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .clear-history-btn:hover {
+            background: rgba(255, 200, 200, 0.4);
+        }
+
+        .sync-status {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #4a8a5a;
+            margin-top: 4px;
+        }
+
+        .sync-status.error {
+            color: #8a4a4a;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 20px;
+            color: #356080;
+        }
+
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0.5;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 400px) {
+            .glass-card {
+                padding: 18px 14px 22px;
+                border-radius: 28px;
+            }
+            .question-text {
+                font-size: 1.2rem;
+            }
+            .personality-type {
+                font-size: 2.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card" id="appContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        (function() {
+            // ==================== 🔧 配置区域 - 请替换为您的Supabase信息 ====================
+            const SUPABASE_URL = 'https://chaepjrtjllrluenqyhq.supabase.co/rest/v1/'; // ← 替换为您的Project URL
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoYWVwanJ0amxscmx1ZW5xeWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzODAxNjAsImV4cCI6MjA5ODk1NjE2MH0.IgJJqVzJ_D213JMY_CrmkEqjY1_KV9n9Kwsg2STi3ts'; // ← 替换为您的anon public key
+            const ADMIN_PASSWORD = 'admin123'; // 管理员密码，可自定义
+            // ============================================================================
+
+            // 初始化Supabase客户端
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            // 93道题目数据
+            const questions = [
+                { text: "当你要外出一整天，你会", options: [{ letter: "J", text: "计划你要做什么和在什么时候做" }, { letter: "P", text: "说去就去" }] },
+                { text: "你认为自己是一个", options: [{ letter: "P", text: "较为随兴所至的人" }, { letter: "J", text: "较为有条理的人" }] },
+                { text: "假如你是一位老师，你会选教", options: [{ letter: "S", text: "以事实为主的课程" }, { letter: "N", text: "涉及理论的课程" }] },
+                { text: "你通常", options: [{ letter: "E", text: "与人容易混熟" }, { letter: "I", text: "比较沉静或矜持" }] },
+                { text: "一般来说，你和哪些人比较合得来？", options: [{ letter: "N", text: "富于想象力的人" }, { letter: "S", text: "现实的人" }] },
+                { text: "你是否经常让", options: [{ letter: "F", text: "你的情感支配你的理智" }, { letter: "T", text: "你的理智主宰你的情感" }] },
+                { text: "处理许多事情上，你会喜欢", options: [{ letter: "P", text: "凭兴所至行事" }, { letter: "J", text: "按照计划行事" }] },
+                { text: "你是否", options: [{ letter: "E", text: "容易让人了解" }, { letter: "I", text: "难于让人了解" }] },
+                { text: "按照程序表做事，", options: [{ letter: "J", text: "合你心意" }, { letter: "P", text: "令你感到束缚" }] },
+                { text: "当你有一份特别的任务，你会喜欢", options: [{ letter: "J", text: "开始前小心组织计划" }, { letter: "P", text: "边做边找须做什么" }] },
+                { text: "在大多数情况下，你会选择", options: [{ letter: "P", text: "顺其自然" }, { letter: "J", text: "按程序表做事" }] },
+                { text: "大多数人会说你是一个", options: [{ letter: "I", text: "重视自我隐私的人" }, { letter: "E", text: "非常坦率开放的人" }] },
+                { text: "你宁愿被人认为是一个", options: [{ letter: "S", text: "实事求是的人" }, { letter: "N", text: "机灵的人" }] },
+                { text: "在一大群人当中，通常是", options: [{ letter: "E", text: "你介绍大家认识" }, { letter: "I", text: "别人介绍你" }] },
+                { text: "你会跟哪些人做朋友？", options: [{ letter: "N", text: "常提出新主意的" }, { letter: "S", text: "脚踏实地的" }] },
+                { text: "你倾向", options: [{ letter: "F", text: "重视感情多于逻辑" }, { letter: "T", text: "重视逻辑多于感情" }] },
+                { text: "你比较喜欢", options: [{ letter: "P", text: "坐观事情发展才作计划" }, { letter: "J", text: "很早就作计划" }] },
+                { text: "你喜欢花很多的时间", options: [{ letter: "I", text: "一个人独处" }, { letter: "E", text: "合别人在一起" }] },
+                { text: "与很多人一起会", options: [{ letter: "E", text: "令你活力培增" }, { letter: "I", text: "常常令你心力憔悴" }] },
+                { text: "你比较喜欢", options: [{ letter: "J", text: "很早便把约会、社交聚集等事情安排妥当" }, { letter: "P", text: "无拘无束，看当时有什么好玩就做什么" }] },
+                { text: "计划一个旅程时，你较喜欢", options: [{ letter: "P", text: "大部分的时间都是跟当天的感觉行事" }, { letter: "J", text: "事先知道大部分的日子会做什么" }] },
+                { text: "在社交聚会中，你", options: [{ letter: "I", text: "有时感到郁闷" }, { letter: "E", text: "常常乐在其中" }] },
+                { text: "你通常", options: [{ letter: "E", text: "和别人容易混熟" }, { letter: "I", text: "趋向自处一隅" }] },
+                { text: "哪些人会更吸引你？", options: [{ letter: "N", text: "一个思想敏捷及非常聪颖的人" }, { letter: "S", text: "实事求是，具丰富常识的人" }] },
+                { text: "在日常工作中，你会", options: [{ letter: "P", text: "颇为喜欢处理迫使你分秒必争的突发" }, { letter: "J", text: "通常预先计划，以免要在压力下工作" }] },
+                { text: "你认为别人一般", options: [{ letter: "I", text: "要花很长时间才认识你" }, { letter: "E", text: "用很短的时间便认识你" }] },
+                { text: "注重隐私 vs 坦率开放", options: [{ letter: "I", text: "注重隐私" }, { letter: "E", text: "坦率开放" }] },
+                { text: "预先安排的 vs 无计划的", options: [{ letter: "J", text: "预先安排的" }, { letter: "P", text: "无计划的" }] },
+                { text: "抽象 vs 具体", options: [{ letter: "N", text: "抽象" }, { letter: "S", text: "具体" }] },
+                { text: "温柔 vs 坚定", options: [{ letter: "F", text: "温柔" }, { letter: "T", text: "坚定" }] },
+                { text: "思考 vs 感受", options: [{ letter: "T", text: "思考" }, { letter: "F", text: "感受" }] },
+                { text: "事实 vs 意念", options: [{ letter: "S", text: "事实" }, { letter: "N", text: "意念" }] },
+                { text: "冲动 vs 决定", options: [{ letter: "P", text: "冲动" }, { letter: "J", text: "决定" }] },
+                { text: "热衷 vs 文静", options: [{ letter: "E", text: "热衷" }, { letter: "I", text: "文静" }] },
+                { text: "文静 vs 外向", options: [{ letter: "I", text: "文静" }, { letter: "E", text: "外向" }] },
+                { text: "有系统 vs 随意", options: [{ letter: "J", text: "有系统" }, { letter: "P", text: "随意" }] },
+                { text: "理论 vs 肯定", options: [{ letter: "N", text: "理论" }, { letter: "S", text: "肯定" }] },
+                { text: "敏感 vs 公正", options: [{ letter: "F", text: "敏感" }, { letter: "T", text: "公正" }] },
+                { text: "令人信服 vs 感人的", options: [{ letter: "T", text: "令人信服" }, { letter: "F", text: "感人的" }] },
+                { text: "声明 vs 概念", options: [{ letter: "S", text: "声明" }, { letter: "N", text: "概念" }] },
+                { text: "不受约束 vs 预先安排", options: [{ letter: "P", text: "不受约束" }, { letter: "J", text: "预先安排" }] },
+                { text: "矜持 vs 健谈", options: [{ letter: "I", text: "矜持" }, { letter: "E", text: "健谈" }] },
+                { text: "有条不紊 vs 不拘小节", options: [{ letter: "J", text: "有条不紊" }, { letter: "P", text: "不拘小节" }] },
+                { text: "意念 vs 实况", options: [{ letter: "N", text: "意念" }, { letter: "S", text: "实况" }] },
+                { text: "同情怜悯 vs 远见", options: [{ letter: "F", text: "同情怜悯" }, { letter: "T", text: "远见" }] },
+                { text: "利益 vs 祝福", options: [{ letter: "T", text: "利益" }, { letter: "F", text: "祝福" }] },
+                { text: "务实的 vs 理论的", options: [{ letter: "S", text: "务实的" }, { letter: "N", text: "理论的" }] },
+                { text: "朋友不多 vs 朋友众多", options: [{ letter: "I", text: "朋友不多" }, { letter: "E", text: "朋友众多" }] },
+                { text: "有系统 vs 即兴", options: [{ letter: "J", text: "有系统" }, { letter: "P", text: "即兴" }] },
+                { text: "富想象的 vs 以事论事", options: [{ letter: "N", text: "富想象的" }, { letter: "S", text: "以事论事" }] },
+                { text: "亲切的 vs 客观的", options: [{ letter: "F", text: "亲切的" }, { letter: "T", text: "客观的" }] },
+                { text: "客观的 vs 热情的", options: [{ letter: "T", text: "客观的" }, { letter: "F", text: "热情的" }] },
+                { text: "建造 vs 发明", options: [{ letter: "S", text: "建造" }, { letter: "N", text: "发明" }] },
+                { text: "文静 vs 爱合群", options: [{ letter: "I", text: "文静" }, { letter: "E", text: "爱合群" }] },
+                { text: "理论 vs 事实", options: [{ letter: "N", text: "理论" }, { letter: "S", text: "事实" }] },
+                { text: "富同情 vs 合逻辑", options: [{ letter: "F", text: "富同情" }, { letter: "T", text: "合逻辑" }] },
+                { text: "具分析力 vs 多愁善感", options: [{ letter: "T", text: "具分析力" }, { letter: "F", text: "多愁善感" }] },
+                { text: "合情合理 vs 令人着迷", options: [{ letter: "S", text: "合情合理" }, { letter: "N", text: "令人着迷" }] },
+                { text: "当你要在一个星期内完成一个大项目，你在开始的时候会", options: [{ letter: "J", text: "把要做的不同工作依次列出" }, { letter: "P", text: "马上动工" }] },
+                { text: "在社交场合中，你经常会感到", options: [{ letter: "I", text: "与某些人很难打开话匣儿和保持对话" }, { letter: "E", text: "与多数人都能从容地长谈" }] },
+                { text: "要做许多人也做的事，你比较喜欢", options: [{ letter: "S", text: "按照一般认可的方法去做" }, { letter: "N", text: "构想一个自己的想法" }] },
+                { text: "你刚认识的朋友能否说出你的兴趣？", options: [{ letter: "E", text: "马上可以" }, { letter: "I", text: "要待他们真正了解你之后才可以" }] },
+                { text: "你通常较喜欢的科目是", options: [{ letter: "N", text: "讲授概念和原则的" }, { letter: "S", text: "讲授事实和数据的" }] },
+                { text: "哪个是较高的赞誉？", options: [{ letter: "F", text: "一贯感性的人" }, { letter: "T", text: "一贯理性的人" }] },
+                { text: "你认为按照程序表做事", options: [{ letter: "P", text: "有时是需要的，但一般来说你不大喜欢这样做" }, { letter: "J", text: "大多数情况下是有帮助而且是你喜欢做的" }] },
+                { text: "和一群人在一起，你通常会选", options: [{ letter: "I", text: "跟你很熟悉的个别人谈话" }, { letter: "E", text: "参与大伙的谈话" }] },
+                { text: "在社交聚会上，你会", options: [{ letter: "E", text: "是说话很多的一个" }, { letter: "I", text: "让别人多说话" }] },
+                { text: "把周末期间要完成的事列成清单，这个主意会", options: [{ letter: "J", text: "合你意" }, { letter: "P", text: "使你提不起劲" }] },
+                { text: "哪个是较高的赞誉？", options: [{ letter: "T", text: "能干的" }, { letter: "F", text: "富有同情心" }] },
+                { text: "你通常喜欢", options: [{ letter: "J", text: "事先安排你的社交约会" }, { letter: "P", text: "随兴之所至做事" }] },
+                { text: "总的说来，要做一个大型作业时，你会选", options: [{ letter: "P", text: "边做边想该做什么" }, { letter: "J", text: "首先把工作按步细分" }] },
+                { text: "你能否滔滔不绝地与人聊天", options: [{ letter: "I", text: "只限于跟你有共同兴趣的人" }, { letter: "E", text: "几乎跟任何人都可以" }] },
+                { text: "你会", options: [{ letter: "S", text: "跟随一些证明有效的方法" }, { letter: "N", text: "分析还有什么毛病，及针对尚未解决的难题" }] },
+                { text: "为乐趣而阅读时，你会", options: [{ letter: "N", text: "喜欢奇特或创新的表达方式" }, { letter: "S", text: "喜欢作者直话直说" }] },
+                { text: "你宁愿替哪一类上司工作？", options: [{ letter: "F", text: "天性淳良，但常常前后不一的" }, { letter: "T", text: "言词尖锐但永远合乎逻辑的" }] },
+                { text: "你做事多数是", options: [{ letter: "P", text: "按当天心情去做" }, { letter: "J", text: "照拟好的程序表去做" }] },
+                { text: "你是否", options: [{ letter: "E", text: "可以和任何人按需求从容地交谈" }, { letter: "I", text: "只是对某些人或在某种情况下才可以畅所欲言" }] },
+                { text: "要作决定时，你认为比较重要的是", options: [{ letter: "T", text: "据事实衡量" }, { letter: "F", text: "考虑他人的感受和意见" }] },
+                { text: "想象的 vs 真实的", options: [{ letter: "N", text: "想象的" }, { letter: "S", text: "真实的" }] },
+                { text: "仁慈慷慨的 vs 意志坚定的", options: [{ letter: "F", text: "仁慈慷慨的" }, { letter: "T", text: "意志坚定的" }] },
+                { text: "公正的 vs 有关怀心", options: [{ letter: "T", text: "公正的" }, { letter: "F", text: "有关怀心" }] },
+                { text: "制作 vs 设计", options: [{ letter: "S", text: "制作" }, { letter: "N", text: "设计" }] },
+                { text: "可能性 vs 必然性", options: [{ letter: "N", text: "可能性" }, { letter: "S", text: "必然性" }] },
+                { text: "温柔 vs 力量", options: [{ letter: "F", text: "温柔" }, { letter: "T", text: "力量" }] },
+                { text: "实际 vs 多愁善感", options: [{ letter: "T", text: "实际" }, { letter: "F", text: "多愁善感" }] },
+                { text: "制造 vs 创造", options: [{ letter: "S", text: "制造" }, { letter: "N", text: "创造" }] },
+                { text: "新颖的 vs 已知的", options: [{ letter: "N", text: "新颖的" }, { letter: "S", text: "已知的" }] },
+                { text: "同情 vs 分析", options: [{ letter: "F", text: "同情" }, { letter: "T", text: "分析" }] },
+                { text: "坚持己见 vs 温柔有爱心", options: [{ letter: "T", text: "坚持己见" }, { letter: "F", text: "温柔有爱心" }] },
+                { text: "具体的 vs 抽象的", options: [{ letter: "S", text: "具体的" }, { letter: "N", text: "抽象的" }] },
+                { text: "全心投入 vs 有决心的", options: [{ letter: "F", text: "全心投入" }, { letter: "T", text: "有决心的" }] },
+                { text: "能干 vs 仁慈", options: [{ letter: "T", text: "能干" }, { letter: "F", text: "仁慈" }] },
+                { text: "实际 vs 创新", options: [{ letter: "S", text: "实际" }, { letter: "N", text: "创新" }] }
+            ];
+
+            // 16种性格类型描述
+            const profiles = {
+                "ISTJ": { name: "物流师", desc: "严肃、安静，藉由集中心志与全力投入、及可被信赖获致成功。行事务实、有序、实际、逻辑、真实及可信赖。十分留意且乐于任何事均有良好组织及有序。负责任，照设定成效来作出决策且不畏阻挠与闲言会坚定为之。重视传统与忠诚，是传统性的思考者或经理。适合需要精确、规则和责任感的工作环境。" },
+                "ISFJ": { name: "守卫者", desc: "安静、和善、负责任且有良心。行事尽责投入，安定性高，常居项目工作或团体之安定力量。愿投入、吃苦及力求精确。兴趣通常不在于科技方面，对细节事务有耐心。忠诚、考虑周到、知性且会关切他人感受。致力于创构有序及和谐的工作与家庭环境。是团队中最可靠的后盾和默默付出者。" },
+                "INFJ": { name: "提倡者", desc: "因为坚忍、创意及必须达成的意图而能成功。会在工作中投注最大的努力。默默强力的、诚挚的及用心的关切他人。因坚守原则而受敬重，提出造福大众利益的明确远景而为人所尊敬与追随。追求创见、关系及物质财物的意义及关联。想了解什么能激励别人及对他人具洞察力。光明正大且坚信其价值观，有组织且果断地履行其愿景。" },
+                "INTJ": { name: "建筑师", desc: "具强大动力与本意来达成目的与创意——固执顽固者。有宏大的愿景且能快速在众多外界事件中找出有意义的模范。对所承负职务，具良好能力于策划工作并完成。具怀疑心、挑剔性、独立性、果决，对专业水准及绩效要求高。是天生的战略家，善于制定长远规划并坚定执行，追求卓越与创新。" },
+                "ISTP": { name: "鉴赏家", desc: "冷静旁观者——安静、预留余地、弹性及会以无偏见的好奇心与未预期原始的幽默观察与分析。有兴趣于探索原因及效果，技术事件是为何及如何运作且使用逻辑的原理组构事实、重视效能。擅长于掌握问题核心及找出解决方式。分析成事的缘由且能实时由大量资料中找出实际问题的核心。是动手能力强的实干家。" },
+                "ISFP": { name: "探险家", desc: "羞怯的、安宁和善地、敏感的、亲切的、且行事谦虚。喜于避开争论，不对他人强加已见或价值观。无意于领导却常是忠诚的追随者。办事不急躁，安于现状无意于以过度的急切或努力破坏现况，且非成果导向。喜欢有自有的空间及照自订的时程办事。以温和的方式体验世界，追求美学与和谐。" },
+                "INFP": { name: "调停者", desc: "安静观察者，具理想性与对其价值观及重要之人具忠诚心。希外在生活形态与内在价值观相吻合。具好奇心且很快能看出机会所在。常担负开发创意的触媒者。除非价值观受侵犯，行事会具弹性、适应力高且承受力强。具想了解及发展他人潜能的企图。对所处境遇及拥有不太在意。是富有诗意和理想主义的梦想家。" },
+                "INTP": { name: "逻辑学家", desc: "安静、自持、弹性及具适应力。特别喜爱追求理论与科学事理。习于以逻辑及分析来解决问题——问题解决者。最有兴趣于创意事务及特定工作，对聚会与闲聊无大兴趣。追求可发挥个人强烈兴趣的生涯。追求发展对有兴趣事务之逻辑解释。是安静的思想家，善于构建理论体系和解决复杂问题。" },
+                "ESTP": { name: "企业家", desc: "擅长现场实时解决问题——解决问题者。喜欢办事并乐于其中及过程。倾向于喜好技术事务及运动，交结同好友人。具适应性、容忍度、务实性；投注心力于会很快具成效工作。不喜欢冗长概念的解释及理论。最专精于可操作、处理、分解或组合的真实事务。是行动派，乐于冒险和迎接挑战。" },
+                "ESFP": { name: "表演者", desc: "外向、和善、接受性、乐于分享喜乐予他人。喜欢与他人一起行动且促成事件发生，在学习时亦然。知晓事件未来的发展并会热列参与。最擅长于人际相处能力及具备完备常识，很有弹性能立即适应他人与环境。对生命、人、物质享受的热爱者。是聚会的焦点，用热情感染身边的每一个人。" },
+                "ENFP": { name: "竞选者", desc: "充满热忱、活力充沛、聪明的、富想象力的，视生命充满机会但期能得自他人肯定与支持。几乎能达成所有有兴趣的事。对难题很快就有对策并能对有困难的人施予援手。依赖能改善的能力而无须预作规划准备。为达目的常能找出强制自己为之的理由。即兴执行者。是灵感迸发的创造者，充满热情和感染力。" },
+                "ENTP": { name: "辩论家", desc: "反应快、聪明、长于多样事务。具激励伙伴、敏捷及直言讳专长。会为了有趣对问题的两面加予争辩。对解决新及挑战性的问题富有策略，但会轻忽或厌烦经常的任务与细节。兴趣多元，易倾向于转移至新生的兴趣。对所想要的会有技巧地找出逻辑的理由。长于看清他人，有智能去解决新或有挑战的问题。" },
+                "ESTJ": { name: "总经理", desc: "务实、真实、事实倾向，具企业或技术天份。不喜欢抽象理论；最喜欢学习可立即运用事理。喜好组织与管理活动且专注以最有效率方式行事以达致成效。具决断力、关注细节且很快作出决策——优秀行政者。会忽略他人感受。喜作领导者或企业主管。是高效的管理者，善于建立秩序和推动执行。" },
+                "ESFJ": { name: "执政官", desc: "诚挚、爱说话、合作性高、受欢迎、光明正大的——天生的合作者及活跃的组织成员。重和谐且长于创造和谐。常作对他人有益事务。给予鼓励及称许会有更佳工作成效。最有兴趣于会直接及有形影响人们生活的事务。喜欢与他人共事去精确且准时地完成工作。是温暖的照顾者，善于维护团队和谐。" },
+                "ENFJ": { name: "主人公", desc: "热忱、易感应及负责任的——具能鼓励他人的领导风格。对别人所想或希求会表达真正关切且切实用心去处理。能怡然且技巧性地带领团体讨论或演示文稿提案。爱交际、受欢迎及富同情心。对称许及批评很在意。喜欢带引别人且能使别人或团体发挥潜能。是天生的教育者和引导者，善于激发他人潜力。" },
+                "ENTJ": { name: "指挥官", desc: "坦诚、具决策力的活动领导者。长于发展与实施广泛的系统以解决组织的问题。专精于具内涵与智能的谈话如对公众演讲。乐于经常吸收新知且能广开信息管道。易生过度自信，会强于表达自已创见。喜于长程策划及目标设定。是天生的领导者，善于统筹全局和带领团队达成目标。" }
+            };
+
+            const appContainer = document.getElementById('appContainer');
+            let currentPage = 'test';
+            let currentIndex = 0;
+            let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            let currentResultType = null;
+            let isAdmin = false;
+            let historyDetailIndex = null;
+
+            // ============ Supabase 数据库操作 ============
+            async function saveResultToServer(type, typeName, scoresData) {
+                try {
+                    const { error } = await supabase
+                        .from('mbti_results')
+                        .insert([
+                            { type, type_name: typeName, scores: scoresData }
+                        ]);
+                    if (error) throw error;
+                    return true;
+                } catch (err) {
+                    console.error('云端保存失败，保存到本地:', err);
+                    const history = JSON.parse(localStorage.getItem('mbti_history') || '[]');
+                    history.unshift({
+                        id: Date.now(), type, typeName, scores: scoresData,
+                        timestamp: new Date().toLocaleString('zh-CN')
+                    });
+                    localStorage.setItem('mbti_history', JSON.stringify(history.slice(0, 50)));
+                    return false;
+                }
+            }
+
+            async function getHistoryFromServer() {
+                try {
+                    const { data, error } = await supabase
+                        .from('mbti_results')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(100);
+                    if (error) throw error;
+                    return data.map(record => ({
+                        id: record.id,
+                        type: record.type,
+                        typeName: record.type_name,
+                        scores: record.scores,
+                        timestamp: new Date(record.created_at).toLocaleString('zh-CN')
+                    }));
+                } catch (err) {
+                    console.error('云端获取失败，使用本地:', err);
+                    return JSON.parse(localStorage.getItem('mbti_history') || '[]');
+                }
+            }
+
+            async function clearServerHistory() {
+                try {
+                    const { error } = await supabase
+                        .from('mbti_results')
+                        .delete()
+                        .neq('id', 0);
+                    if (error) throw error;
+                    return true;
+                } catch (err) {
+                    console.error('清除失败:', err);
+                    return false;
+                }
+            }
+
+            // ============ 渲染函数 ============
+            function render() {
+                switch (currentPage) {
+                    case 'test': renderQuestion(); break;
+                    case 'result': renderResult(); break;
+                    case 'history': renderHistory(); break;
+                    case 'history-detail': renderHistoryDetail(); break;
+                }
+            }
+
+            function renderQuestion() {
+                const q = questions[currentIndex];
+                const progress = (currentIndex / questions.length) * 100;
+
+                appContainer.innerHTML = `
+                    <div class="test-header">
+                        <h1>MBTI 职业性格测试</h1>
+                        <p class="subtitle">中智咨询 · 93题专业版</p>
+                        <p class="sync-status">🟢 云端同步已启用</p>
+                    </div>
+                    <div class="dimension-hint">E/I · S/N · T/F · J/P</div>
+                    <div class="progress-section">
+                        <div class="progress-track"><div class="progress-fill" style="width: ${progress}%;"></div></div>
+                        <div class="question-counter">${currentIndex + 1} / ${questions.length}</div>
+                    </div>
+                    <div class="question-card"><div class="question-text">${q.text}</div></div>
+                    <div class="options-grid">
+                        ${q.options.map(opt => `
+                            <div class="option-btn" data-letter="${opt.letter}">
+                                <span class="option-letter">${opt.letter}</span><span>${opt.text}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="btn-group">
+                        <button class="history-btn" id="gotoHistoryBtn">📋 历史记录</button>
+                    </div>
+                `;
+
+                appContainer.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const letter = this.getAttribute('data-letter');
+                        if (scores[letter] !== undefined) scores[letter]++;
+                        if (currentIndex < questions.length - 1) {
+                            currentIndex++;
+                            render();
+                        } else {
+                            const type = calculateType(scores);
+                            const profile = profiles[type] || { name: "探索者", desc: "独特的性格组合。" };
+                            saveResultToServer(type, profile.name, { ...scores });
+                            currentResultType = type;
+                            currentPage = 'result';
+                            render();
+                        }
+                    });
+                });
+
+                document.getElementById('gotoHistoryBtn').addEventListener('click', () => {
+                    currentPage = 'history'; render();
+                });
+            }
+
+            function calculateType(s) {
+                return ((s.E >= s.I ? 'E' : 'I') +
+                    (s.S >= s.N ? 'S' : 'N') +
+                    (s.T >= s.F ? 'T' : 'F') +
+                    (s.J >= s.P ? 'J' : 'P'));
+            }
+
+            function renderResult() {
+                const type = currentResultType || calculateType(scores);
+                const profile = profiles[type] || { name: "探索者", desc: "独特的性格组合。" };
+
+                appContainer.innerHTML = `
+                    <div class="result-container">
+                        <div class="test-header"><h1>测试结果</h1><p class="subtitle">中智咨询 · MBTI 职业性格测试</p></div>
+                        <div class="personality-type">${type}</div>
+                        <div class="type-name">${profile.name}</div>
+                        <div class="analysis-box"><strong>📋 详细性格分析</strong><br><br>${profile.desc}</div>
+                        <div class="analysis-box">
+                            <strong>📊 各维度得分</strong>
+                            <div class="score-grid">
+                                <div class="score-item"><span>外向(E)</span><span>${scores.E}分</span></div>
+                                <div class="score-item"><span>内向(I)</span><span>${scores.I}分</span></div>
+                                <div class="score-item"><span>实感(S)</span><span>${scores.S}分</span></div>
+                                <div class="score-item"><span>直觉(N)</span><span>${scores.N}分</span></div>
+                                <div class="score-item"><span>思考(T)</span><span>${scores.T}分</span></div>
+                                <div class="score-item"><span>情感(F)</span><span>${scores.F}分</span></div>
+                                <div class="score-item"><span>判断(J)</span><span>${scores.J}分</span></div>
+                                <div class="score-item"><span>认知(P)</span><span>${scores.P}分</span></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="restart-btn" id="restartBtn">↻ 重新测试</button>
+                            <button class="history-btn" id="historyBtn">📋 历史记录</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('restartBtn').onclick = () => {
+                    currentIndex = 0;
+                    scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+                    currentResultType = null;
+                    currentPage = 'test';
+                    render();
+                };
+                document.getElementById('historyBtn').onclick = () => { currentPage = 'history';
+                    render(); };
+            }
+
+            async function renderHistory() {
+                appContainer.innerHTML = '<div class="loading-spinner">⏳ 加载历史记录中...</div>';
+                const history = await getHistoryFromServer();
+
+                if (history.length === 0) {
+                    appContainer.innerHTML = `
+                        <div class="test-header"><h1>📋 历史记录</h1></div>
+                        <div class="empty-state"><div class="icon">📭</div><p>暂无测试记录</p></div>
+                        <div class="btn-group"><button class="back-btn" id="backBtn">← 返回</button></div>
+                    `;
+                } else {
+                    appContainer.innerHTML = `
+                        <div class="test-header"><h1>📋 历史记录</h1><p class="subtitle">共 ${history.length} 条 · 云端同步</p></div>
+                        <div class="history-list">
+                            ${history.map((r, i) => `
+                                <div class="history-item" data-index="${i}">
+                                    <div>
+                                        <div class="history-type">${r.type} - <span class="history-name">${r.typeName}</span></div>
+                                        <div class="history-time">${r.timestamp}</div>
+                                    </div>
+                                    <span style="font-size:1.5rem;">→</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="btn-group">
+                            ${isAdmin ? '<button class="clear-history-btn" id="clearBtn">🗑️ 清空记录(管理员)</button>' : ''}
+                            <button class="back-btn" id="backBtn">← 返回</button>
+                            ${!isAdmin ? '<button class="history-btn" id="adminBtn">🔑 管理员</button>' : ''}
+                        </div>
+                    `;
+
+                    document.querySelectorAll('.history-item').forEach(item => {
+                        item.onclick = () => { historyDetailIndex = parseInt(item.dataset.index);
+                            currentPage = 'history-detail';
+                            render(); };
+                    });
+                    if (isAdmin) document.getElementById('clearBtn').onclick = async () => {
+                        if (confirm('确认清空所有云端记录？')) { await clearServerHistory();
+                            render(); }
+                    };
+                    if (!isAdmin) document.getElementById('adminBtn').onclick = showAdminLogin;
+                    document.getElementById('backBtn').onclick = () => {
+                        currentPage = currentResultType ? 'result' : 'test';
+                        render();
+                    };
+                }
+            }
+
+            async function renderHistoryDetail() {
+                const history = await getHistoryFromServer();
+                const record = history[historyDetailIndex];
+                if (!record) { currentPage = 'history';
+                    render(); return; }
+                const profile = profiles[record.type] || { name: "未知", desc: "暂无描述" };
+
+                appContainer.innerHTML = `
+                    <div class="test-header"><h1>历史详情</h1><p>${record.timestamp}</p></div>
+                    <div class="personality-type">${record.type}</div>
+                    <div class="type-name">${profile.name}</div>
+                    <div class="analysis-box">${profile.desc}</div>
+                    <div class="score-grid">
+                        ${Object.entries(record.scores).map(([k, v]) => `<div class="score-item"><span>${k}</span><span>${v}分</span></div>`).join('')}
+                    </div>
+                    <div class="btn-group">
+                        <button class="back-btn" id="backBtn">← 返回列表</button>
+                        <button class="restart-btn" id="newBtn">↻ 新测试</button>
+                    </div>
+                `;
+                document.getElementById('backBtn').onclick = () => { currentPage = 'history';
+                    render(); };
+                document.getElementById('newBtn').onclick = () => {
+                    currentIndex = 0;
+                    scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+                    currentResultType = null;
+                    currentPage = 'test';
+                    render();
+                };
+            }
+
+            function showAdminLogin() {
+                appContainer.innerHTML = `
+                    <div class="test-header"><h3>🔑 管理员验证</h3></div>
+                    <div style="text-align:center; padding:20px;">
+                        <input type="password" id="passwordInput" class="option-btn" placeholder="请输入管理密码" style="width:100%; text-align:center;">
+                        <br><br>
+                        <button class="restart-btn" id="loginBtn">验证</button>
+                        <button class="back-btn" id="cancelBtn" style="margin-left:10px;">取消</button>
+                    </div>
+                `;
+                document.getElementById('loginBtn').onclick = () => {
+                    if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) {
+                        isAdmin = true;
+                        alert('✅ 验证成功！您现在可以管理历史记录。');
+                        currentPage = 'history';
+                        render();
+                    } else { alert('❌ 密码错误'); }
+                };
+                document.getElementById('cancelBtn').onclick = () => { currentPage = 'history';
+                    render(); };
+            }
+
+            // 启动
+            render();
+        })();
+    </script>
+</body>
+</html>
